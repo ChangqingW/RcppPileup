@@ -11,7 +11,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // pileup_readid
-int pileup_readid(Rcpp::String bam_path, Rcpp::String seqname, int pos);
+Rcpp::List pileup_readid(Rcpp::String bam_path, Rcpp::String seqname, int pos);
 RcppExport SEXP _RcppPileup_pileup_readid(SEXP bam_pathSEXP, SEXP seqnameSEXP, SEXP posSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
