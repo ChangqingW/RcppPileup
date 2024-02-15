@@ -2,9 +2,14 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 #' list alleles and the read id that supports them at a given pos
-#'
 #' @export
 pileup_readid <- function(bam_path, seqname, pos) {
     .Call(`_RcppPileup_pileup_readid`, bam_path, seqname, pos)
+}
+
+#' produce a matrix of variants and cell barcodes
+#' @export
+variant_matrix <- function(bam_path, seqname, pos, barcodes) {
+    .Call(`_RcppPileup_variant_matrix`, bam_path, seqname, pos, barcodes)
 }
 
