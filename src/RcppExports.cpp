@@ -10,9 +10,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// pileup_readid
-Rcpp::List pileup_readid(Rcpp::String bam_path, Rcpp::String seqname, int pos, bool indel);
-RcppExport SEXP _RcppPileup_pileup_readid(SEXP bam_pathSEXP, SEXP seqnameSEXP, SEXP posSEXP, SEXP indelSEXP) {
+// variant_count_matrix_cpp
+Rcpp::NumericMatrix variant_count_matrix_cpp(Rcpp::String bam_path, Rcpp::String seqname, int pos, bool indel, Rcpp::StringVector barcodes);
+RcppExport SEXP _RcppPileup_variant_count_matrix_cpp(SEXP bam_pathSEXP, SEXP seqnameSEXP, SEXP posSEXP, SEXP indelSEXP, SEXP barcodesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,29 +20,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::String >::type seqname(seqnameSEXP);
     Rcpp::traits::input_parameter< int >::type pos(posSEXP);
     Rcpp::traits::input_parameter< bool >::type indel(indelSEXP);
-    rcpp_result_gen = Rcpp::wrap(pileup_readid(bam_path, seqname, pos, indel));
-    return rcpp_result_gen;
-END_RCPP
-}
-// variant_matrix
-Rcpp::NumericMatrix variant_matrix(Rcpp::String bam_path, Rcpp::String seqname, int pos, Rcpp::StringVector barcodes, bool indel);
-RcppExport SEXP _RcppPileup_variant_matrix(SEXP bam_pathSEXP, SEXP seqnameSEXP, SEXP posSEXP, SEXP barcodesSEXP, SEXP indelSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::String >::type bam_path(bam_pathSEXP);
-    Rcpp::traits::input_parameter< Rcpp::String >::type seqname(seqnameSEXP);
-    Rcpp::traits::input_parameter< int >::type pos(posSEXP);
     Rcpp::traits::input_parameter< Rcpp::StringVector >::type barcodes(barcodesSEXP);
-    Rcpp::traits::input_parameter< bool >::type indel(indelSEXP);
-    rcpp_result_gen = Rcpp::wrap(variant_matrix(bam_path, seqname, pos, barcodes, indel));
+    rcpp_result_gen = Rcpp::wrap(variant_count_matrix_cpp(bam_path, seqname, pos, indel, barcodes));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_RcppPileup_pileup_readid", (DL_FUNC) &_RcppPileup_pileup_readid, 4},
-    {"_RcppPileup_variant_matrix", (DL_FUNC) &_RcppPileup_variant_matrix, 5},
+    {"_RcppPileup_variant_count_matrix_cpp", (DL_FUNC) &_RcppPileup_variant_count_matrix_cpp, 5},
     {NULL, NULL, 0}
 };
 
