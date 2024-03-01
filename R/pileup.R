@@ -40,8 +40,7 @@ sc_mutations <- function(bam_path, seqnames, positions, indel, barcodes, threads
         variant_count_tb(bam_path, seqname, pos, indel, barcodes)
       },
       seqname = seqnames, pos = positions, SIMPLIFY = FALSE, mc.cores = threads
-    ) |>
-      dplyr::bind_rows()
+    )
   } else {
     # multiple bam files, parallelize over bam files
     stopifnot(
@@ -70,8 +69,21 @@ sc_mutations <- function(bam_path, seqnames, positions, indel, barcodes, threads
       sample_bam = args_grid$sample_bam, seqname = args_grid$seqname,
       pos = args_grid$pos, sample_barcodes = args_grid$sample_barcodes,
       SIMPLIFY = FALSE, mc.cores = threads
-    ) |>
-      dplyr::bind_rows()
+    )
   }
+
+  errors <- variants[sapply(variants, \(x) inherits(x, "try-error"))]
+  if (length(errors) > 0) {
+    warning(paste0(
+      length(errors), " errors encountered out of ", length(variants), " positions * BAMs checked:"
+    ))
+    sapply(errors, \(x) x[1]) |>
+      table() |>
+      print()
+  }
+
+  variants <- variants[sapply(variants, \(x) !inherits(x, "try-error"))] |>
+    dplyr::bind_rows()
+
   return(variants)
 }
