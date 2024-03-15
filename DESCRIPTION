@@ -13,3 +13,8 @@ RoxygenNote: 7.3.1
 LinkingTo: 
     Rcpp, Rhtslib, zlibbioc, testthat
 SystemRequirements: GNU make, C++17
+Imports: 
+    dplyr,
+    parallel,
+    tibble,
+    tidyr
