@@ -22,8 +22,52 @@ variant_count_tb <- function(bam_path, seqname, pos, indel, barcodes) {
     dplyr::ungroup()
 }
 
+#' Variant count for single-cell data
+#'
+#' Count the number of reads supporting each variants at the given positions for each cell.
+#'
+#' @param bam_path character(1) or character(n): path to the bam file(s) aligned to the
+#' reference genome (NOT the transcriptome! Unless the postions are also from the transcriptome).
+#' @param seqnames character(n): chromosome names of the postions to count alleles.
+#' @param positions integer(n): positions, 1-based, same length as seqnames. The positions to count alleles.
+#' @param indel logical(1): whether to count indels (TRUE) or SNPs (FALSE).
+#' @param barcodes character(n) when bam_path is a single file, or list of character(n)
+#' when bam_path is a list of files paths. The cell barcodes to count alleles for.
+#' Only reads with these barcodes will be counted.
+#' @param threads integer(1): number of threads to use. Maximum number of threads is
+#' the number of bam files * number of positions.
+#' @return A tibble with columns: allele, barcode, allele_count, cell_total_reads, pct, pos, seqname.
+#' @examples
+#' outdir <- tempfile()
+#' dir.create(outdir)
+#' genome_fa <- file.path(outdir, "rps24.fa")
+#' R.utils::gunzip(filename = system.file("extdata/rps24.fa.gz", package = "FLAMES"), destname = genome_fa, remove = FALSE)
+#' download.file("https://raw.githubusercontent.com/mritchielab/FLAMES/devel/tests/testthat/demultiplexed.fq",
+#'   destfile = file.path(outdir, "demultipelxed.fq")
+#' ) # can't be bothered to run demultiplexing again
+#' if (is.character(locate_minimap2_dir())) {
+#'   minimap2_align( # align to genome
+#'     config = jsonlite::fromJSON(system.file("extdata/SIRV_config_default.json", package = "FLAMES")),
+#'     fa_file = genome_fa,
+#'     fq_in = file.path(outdir, "demultipelxed.fq"),
+#'     annot = system.file("extdata/rps24.gtf.gz", package = "FLAMES"),
+#'     outdir = outdir
+#'   )
+#'   snps_tb <- sc_mutations(
+#'     bam_path = file.path(outdir, "align2genome.bam"),
+#'     seqnames = c("chr14", "chr14"),
+#'     positions = c(1260, 2714), # positions of interest
+#'     indel = FALSE,
+#'     barcodes = read.delim(system.file("extdata/bc_allow.tsv.gz", package = "FLAMES"), header = FALSE)$V1
+#'   )
+#'   head(snps_tb)
+#'   snps_tb |>
+#'     dplyr::filter(pos == 1260) |>
+#'     dplyr::group_by(allele) |>
+#'     dplyr::summarise(count = sum(allele_count)) # should be identical to samtools pileup
+#' }
 #' @export
-sc_mutations <- function(bam_path, seqnames, positions, indel, barcodes, threads = 1) {
+sc_mutations <- function(bam_path, seqnames, positions, indel = FALSE, barcodes, threads = 1) {
   stopifnot(
     "seqnames not the same length as positions" =
       length(seqnames) == length(positions)
